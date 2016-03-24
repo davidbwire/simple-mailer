@@ -1,0 +1,71 @@
+<?php
+
+require_once './vendor/autoload.php';
+
+$senderEmail = '';
+$senderName = '';
+
+$recipientEmail = '';
+$recipientName = '';
+
+$emailBody = '';
+$emailSubject = '';
+
+
+$request = new Zend\Http\PhpEnvironment\Request(false);
+$response = new Zend\Http\PhpEnvironment\Response();
+
+// ensure it's a post response and isXmlHttpRequest
+if (!$request->isPost()) {
+    $response->setStatusCode(400);
+    $response->setContent(json_encode(['status' => $response->getStatusCode(),
+        'title' => $response->getReasonPhrase()]));
+    $response->getHeaders()->addHeaderLine('Content-Type: application/json');
+    return $response->send();
+}
+
+// check that the email is valid
+$emailValidator = new Zend\Validator\EmailAddress();
+if (!$emailValidator->isValid(trim($request->getPost('email')))) {
+    $response->setStatusCode(422);
+    $response->setContent(json_encode(["detail" => "Failed Validation",
+        "status" => $response->getStatusCode(),
+        "title" => $response->getReasonPhrase(),
+        "validation_messages" => $emailValidator->getMessages()]));
+    $response->getHeaders()->addHeaderLine('Content-Type: application/json');
+    return $response->send();
+}
+
+
+$email = new Zend\Mail\Message();
+$email->setBody($emailBody);
+$email->setFrom($senderEmail, $senderName);
+$email->addTo($recipientEmail, $recipientName);
+$email->setSubject($emailSubject);
+// cc the sender by default
+$email->addCc($senderEmail);
+
+$transport = new \Zend\Mail\Transport\Smtp();
+$options = new Zend\Mail\Transport\SmtpOptions(array(
+    // Local client hostname
+    'name' => 'localhost.yourdomain',
+    // IP address or host name of the SMTP server via which to send messages
+    'host' => '127.0.0.1',
+    'connection_class' => 'login',
+    'connection_config' => array(
+        'username' => 'email@yourdomain',
+        'password' => "your_password",
+    ),
+        ));
+try {
+    $transport->setOptions($options);
+    $transport->send($email);
+    return $response->send();
+} catch (\Exception $ex) {
+    $response->setStatusCode(500);
+    $response->setContent(json_encode(["detail" => $ex->getMessage(),
+        "status" => $response->getStatusCode(),
+        "title" => $response->getReasonPhrase()]));
+    $response->getHeaders()->addHeaderLine('Content-Type: application/json');
+    return $response->send();
+}

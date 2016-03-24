@@ -1,0 +1,17 @@
+{
+    "name": "SimpleMailer",
+    "description": "provides generalized functionality to compose and send both text and MIME-compliant multipart e-mail messages from a contact us form",
+    "license": "MIT",
+    "keywords": [
+        "form",
+        "contact us",
+        "mailer",
+        "mail"
+    ],
+    "require": {
+        "php": "^5.5 || ^7.0",
+        "zendframework/zend-mail": "^2.6",
+        "zendframework/zend-servicemanager": "^3.0",
+        "zendframework/zend-http": "^2.5.4"
+    }
+}
