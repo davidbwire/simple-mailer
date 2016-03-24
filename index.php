@@ -2,14 +2,14 @@
 
 require_once './vendor/autoload.php';
 
-$senderEmail = '';
-$senderName = '';
+$senderEmail;
+$senderName;
+$emailBody;
 
 $recipientEmail = '';
 $recipientName = '';
 
-$emailBody = '';
-$emailSubject = '';
+$emailSubject = '[Contact Us] - Your Domain';
 
 
 $request = new Zend\Http\PhpEnvironment\Request(false);
@@ -23,6 +23,12 @@ if (!$request->isPost()) {
     $response->getHeaders()->addHeaderLine('Content-Type: application/json');
     return $response->send();
 }
+
+// capture information sent in
+$senderEmail = $request->getPost('sender_email');
+$senderName = $request->getPost('sender_name');
+
+$emailBody = $request->getPost('email_body');
 
 // check that the email is valid
 $emailValidator = new Zend\Validator\EmailAddress();
