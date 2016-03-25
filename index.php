@@ -66,6 +66,9 @@ try {
 
     $transport->setOptions($options);
     $transport->send($email);
+    $response->setStatusCode(200);
+    $response->setContent(json_encode(array("success" => "Your email has been sent")));
+    $response->getHeaders()->addHeaderLine('Content-Type: application/json');
     return $response->send();
 } catch (\Exception $ex) {
     $response->setStatusCode(500);
