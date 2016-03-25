@@ -41,29 +41,29 @@ if (!$emailValidator->isValid(trim($request->getPost('sender_email')))) {
     $response->getHeaders()->addHeaderLine('Content-Type: application/json');
     return $response->send();
 }
-
-
-$email = new Zend\Mail\Message();
-$email->setBody($emailBody);
-$email->setFrom($senderEmail, $senderName);
-$email->addTo($recipientEmail, $recipientName);
-$email->setSubject($emailSubject);
-// cc the sender by default
-$email->addCc($senderEmail);
-
-$transport = new \Zend\Mail\Transport\Smtp();
-$options = new Zend\Mail\Transport\SmtpOptions(array(
-    // Local client hostname
-    'name' => 'localhost.yourdomain',
-    // IP address or host name of the SMTP server via which to send messages
-    'host' => '127.0.0.1',
-    'connection_class' => 'login',
-    'connection_config' => array(
-        'username' => 'email@yourdomain',
-        'password' => "your_password",
-    ),
-        ));
 try {
+
+    $email = new Zend\Mail\Message();
+    $email->setBody('[' . $senderName . '] says; ' . $emailBody);
+    $email->setFrom($senderEmail, $senderName);
+    $email->addTo($recipientEmail, $recipientName);
+    $email->setSubject($emailSubject);
+    // cc the sender by default
+    $email->addCc($senderEmail);
+
+    $transport = new \Zend\Mail\Transport\Smtp();
+    $options = new Zend\Mail\Transport\SmtpOptions(array(
+        // Local client hostname
+        'name' => 'localhost.yourdomain',
+        // IP address or host name of the SMTP server via which to send messages
+        'host' => '127.0.0.1',
+        'connection_class' => 'login',
+        'connection_config' => array(
+            'username' => 'email@yourdomain',
+            'password' => "your_password",
+        ),
+    ));
+
     $transport->setOptions($options);
     $transport->send($email);
     return $response->send();
