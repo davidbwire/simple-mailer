@@ -32,7 +32,7 @@ $emailBody = $request->getPost('email_body');
 
 // check that the email is valid
 $emailValidator = new Zend\Validator\EmailAddress();
-if (!$emailValidator->isValid(trim($request->getPost('email')))) {
+if (!$emailValidator->isValid(trim($request->getPost('sender_email')))) {
     $response->setStatusCode(422);
     $response->setContent(json_encode(["detail" => "Failed Validation",
         "status" => $response->getStatusCode(),
