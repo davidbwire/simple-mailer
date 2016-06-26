@@ -17,11 +17,23 @@ $recipientEmail = $config['simple_mailer']['recipient']['email'];
 $emailSubject = '[Contact Us] - ' . $config['domain_name'];
 
 
-$request = new Request(false);
+$request = new Request();
 $response = new Response();
+
+function redirect(Response $response, $url = '/')
+{
+    $response->getHeaders()->addHeaderLine('Location', $url);
+    $response->setStatusCode(302);
+    $response->send();
+}
+
+$isXmlHttpRequest = $request->isXmlHttpRequest();
 
 // ensure it's a post response and isXmlHttpRequest
 if (!$request->isPost()) {
+    if (!$isXmlHttpRequest) {
+        return redirect($response, '/');
+    }
     $response->setStatusCode(400);
     $response->setContent(json_encode(['status' => $response->getStatusCode(),
         'title' => $response->getReasonPhrase()]));
@@ -42,6 +54,9 @@ if (!$emailValidator->isValid(trim($request->getPost('sender_email')))) {
         "status" => $response->getStatusCode(),
         "title" => $response->getReasonPhrase(),
         "validation_messages" => $emailValidator->getMessages()]));
+    if (!$isXmlHttpRequest) {
+        return redirect($response, '/');
+    }
     $response->getHeaders()->addHeaderLine('Content-Type: application/json');
     return $response->send();
 }
@@ -54,6 +69,10 @@ try {
 
     $response->setStatusCode(200);
     $response->setContent(json_encode(array("success" => "Your email has been sent")));
+
+    if (!$isXmlHttpRequest) {
+        return redirect($response, '/');
+    }
     $response->getHeaders()->addHeaderLine('Content-Type: application/json');
     return $response->send();
 } catch (\Exception $ex) {
@@ -61,6 +80,9 @@ try {
     $response->setContent(json_encode(["detail" => $ex->getMessage(),
         "status" => $response->getStatusCode(),
         "title" => $response->getReasonPhrase()]));
+    if (!$isXmlHttpRequest) {
+        return redirect($response, $url);
+    }
     $response->getHeaders()->addHeaderLine('Content-Type: application/json');
     return $response->send();
 }
