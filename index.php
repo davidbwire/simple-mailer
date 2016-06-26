@@ -8,8 +8,8 @@ use Zend\Http\PhpEnvironment\Request;
 use Zend\Http\PhpEnvironment\Response;
 use Bitmarshals\Mail\SimpleMailer;
 
-$senderEmail;
-$senderName;
+$clientEmail;
+$clientName;
 $emailBody;
 
 $recipientEmail = $config['simple_mailer']['recipient']['email'];
@@ -30,8 +30,8 @@ if (!$request->isPost()) {
 }
 
 // capture information sent in
-$senderEmail = $request->getPost('sender_email');
-$senderName = $request->getPost('sender_name');
+$clientEmail = $request->getPost('client_email');
+$clientName = $request->getPost('client_name');
 $emailBody = $request->getPost('email_body');
 
 // check that the email is valid
@@ -48,7 +48,7 @@ if (!$emailValidator->isValid(trim($request->getPost('sender_email')))) {
 try {
     $simpleMailer = new SimpleMailer($config);
     $emailMessage = $simpleMailer->generateEmailMessage($recipientEmail,
-            $emailSubject, $senderName . ';' . $senderEmail . '; ' . $emailBody);
+            $emailSubject, $clientName . ';' . $clientEmail . '; ' . $emailBody);
     // send email
     $simpleMailer->send($emailMessage);
 
