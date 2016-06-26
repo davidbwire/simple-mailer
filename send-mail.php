@@ -63,7 +63,9 @@ if (!$emailValidator->isValid(trim($request->getPost('client_email')))) {
 try {
     $simpleMailer = new SimpleMailer($config);
     $emailMessage = $simpleMailer->generateEmailMessage($recipientEmail,
-            $emailSubject, $clientName . ';' . $clientEmail . '; ' . $emailBody);
+            $emailSubject,
+            $clientName . ';' . PHP_EOL . $clientEmail . '; '
+            . PHP_EOL . PHP_EOL . $emailBody);
     // send email
     $simpleMailer->send($emailMessage);
 
