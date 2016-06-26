@@ -24,7 +24,7 @@ function redirect(Response $response, $url = '/')
 {
     $response->getHeaders()->addHeaderLine('Location', $url);
     $response->setStatusCode(302);
-    $response->send();
+    return $response->send();
 }
 
 $isXmlHttpRequest = $request->isXmlHttpRequest();
@@ -48,7 +48,7 @@ $emailBody = $request->getPost('email_body');
 
 // check that the email is valid
 $emailValidator = new Zend\Validator\EmailAddress();
-if (!$emailValidator->isValid(trim($request->getPost('sender_email')))) {
+if (!$emailValidator->isValid(trim($request->getPost('client_email')))) {
     $response->setStatusCode(422);
     $response->setContent(json_encode(["detail" => "Failed Validation",
         "status" => $response->getStatusCode(),
