@@ -1,19 +1,24 @@
 <?php
 
 require_once './vendor/autoload.php';
+require_once './src/Bitmarshals/Mail/SimpleMailer.php';
+$config = require_once './config/config.php';
+
+use Zend\Http\PhpEnvironment\Request;
+use Zend\Http\PhpEnvironment\Response;
+use Bitmarshals\Mail\SimpleMailer;
 
 $senderEmail;
 $senderName;
 $emailBody;
 
-$recipientEmail = '';
-$recipientName = '';
+$recipientEmail = $config['simple_mailer']['recipient']['email'];
 
-$emailSubject = '[Contact Us] - Your Domain';
+$emailSubject = '[Contact Us] - ' . $config['domain_name'];
 
 
-$request = new Zend\Http\PhpEnvironment\Request(false);
-$response = new Zend\Http\PhpEnvironment\Response();
+$request = new Request(false);
+$response = new Response();
 
 // ensure it's a post response and isXmlHttpRequest
 if (!$request->isPost()) {
@@ -27,7 +32,6 @@ if (!$request->isPost()) {
 // capture information sent in
 $senderEmail = $request->getPost('sender_email');
 $senderName = $request->getPost('sender_name');
-
 $emailBody = $request->getPost('email_body');
 
 // check that the email is valid
@@ -42,30 +46,12 @@ if (!$emailValidator->isValid(trim($request->getPost('sender_email')))) {
     return $response->send();
 }
 try {
+    $simpleMailer = new SimpleMailer($config);
+    $emailMessage = $simpleMailer->generateEmailMessage($recipientEmail,
+            $emailSubject, $senderName . ';' . $senderEmail . '; ' . $emailBody);
+    // send email
+    $simpleMailer->send($emailMessage);
 
-    $email = new Zend\Mail\Message();
-    $email->setBody('[' . $senderName . '] says; ' . $emailBody);
-    $email->setFrom($senderEmail, $senderName);
-    $email->addTo($recipientEmail, $recipientName);
-    $email->setSubject($emailSubject);
-    // cc the sender by default
-    $email->addCc($senderEmail);
-
-    $transport = new \Zend\Mail\Transport\Smtp();
-    $options = new Zend\Mail\Transport\SmtpOptions(array(
-        // Local client hostname
-        'name' => 'localhost.yourdomain',
-        // IP address or host name of the SMTP server via which to send messages
-        'host' => '127.0.0.1',
-        'connection_class' => 'login',
-        'connection_config' => array(
-            'username' => 'email@yourdomain',
-            'password' => "your_password",
-        ),
-    ));
-
-    $transport->setOptions($options);
-    $transport->send($email);
     $response->setStatusCode(200);
     $response->setContent(json_encode(array("success" => "Your email has been sent")));
     $response->getHeaders()->addHeaderLine('Content-Type: application/json');
