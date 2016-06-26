@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * This is a sample file copy it to the config folder
+ */
+return [
+    'domain_name' => 'Your Domain dot com',
+    'simple_mailer' => [
+        'recipient' => [
+            'email' => 'you@yourdomain.com'
+        ],
+        'smtp_options' => [
+            'host' => 'smtp.zoho.com',
+            'connection_class' => 'login',
+            'connection_config' => array(
+                'ssl' => 'tls',
+                // set dynamically when preparing mail message
+                'username' => "",
+                'password' => "",
+            ),
+            'port' => 587
+        ],
+        // the different email accounts and password
+        'accounts' => [
+            'default' => [
+                'name' => '',
+                'username' => '',
+                'password' => ''
+            ],
+            'example' => [
+                'name' => 'Sender\'s Name',
+                'username' => 'example@yourdomain.com',
+                'password' => 'password',
+            ],
+        ]
+    ]
+];
