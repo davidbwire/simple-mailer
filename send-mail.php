@@ -83,7 +83,7 @@ try {
         "status" => $response->getStatusCode(),
         "title" => $response->getReasonPhrase()]));
     if (!$isXmlHttpRequest) {
-        return redirect($response, $url);
+        return redirect($response);
     }
     $response->getHeaders()->addHeaderLine('Content-Type: application/json');
     return $response->send();
